@@ -9,11 +9,12 @@ const io = new Server(server, { cors: { origin: "*" } });
 
 const PORT = process.env.PORT || 10000;
 
-app.use(express.static(path.join(__dirname)));
-
+// Yeh route explicitly index.html ko browser par bhejega
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
+
+app.use(express.static(path.join(__dirname)));
 
 const rooms = {};
 

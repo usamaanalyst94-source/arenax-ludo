@@ -51,7 +51,7 @@
         </button>
       </div>
 
-      <!-- UPDATED 15x15 GRID BOARD CONTAINER -->
+      <!-- 15x15 GRID BOARD CONTAINER -->
       <div id="board" class="w-full aspect-square bg-slate-950 border-2 border-slate-800 rounded-2xl grid grid-cols-15 grid-rows-15 relative p-1 gap-[1px] overflow-hidden">
         <!-- Board cells will be populated here -->
       </div>
@@ -91,7 +91,47 @@
       if (params.get('room')) {
         document.getElementById('room-input').value = params.get('room');
       }
+      renderBoard();
     };
+
+    // Render Ludo Board Grid Structure
+    function renderBoard() {
+      const board = document.getElementById('board');
+      if (!board) return;
+      board.innerHTML = '';
+
+      for (let row = 0; row < 15; row++) {
+        for (let col = 0; col < 15; col++) {
+          const cell = document.createElement('div');
+          cell.className = "w-full h-full bg-slate-900 border border-slate-950/40 text-[8px] flex items-center justify-center";
+          cell.dataset.row = row;
+          cell.dataset.col = col;
+
+          // Red Home Base (Top-Left)
+          if (row < 6 && col < 6) {
+            cell.className = "w-full h-full bg-red-600/30 border border-red-500/40";
+          }
+          // Green Home Base (Top-Right)
+          else if (row < 6 && col > 8) {
+            cell.className = "w-full h-full bg-green-600/30 border border-green-500/40";
+          }
+          // Yellow Home Base (Bottom-Left)
+          else if (row > 8 && col < 6) {
+            cell.className = "w-full h-full bg-yellow-600/30 border border-yellow-500/40";
+          }
+          // Blue Home Base (Bottom-Right)
+          else if (row > 8 && col > 8) {
+            cell.className = "w-full h-full bg-blue-600/30 border border-blue-500/40";
+          }
+          // Center Home (Winning Area)
+          else if (row >= 6 && row <= 8 && col >= 6 && col <= 8) {
+            cell.className = "w-full h-full bg-purple-900/40 border border-purple-500/30";
+          }
+
+          board.appendChild(cell);
+        }
+      }
+    }
 
     function joinRoom() {
       myUsername = document.getElementById('username-input').value.trim() || 'Player_' + Math.floor(Math.random()*1000);

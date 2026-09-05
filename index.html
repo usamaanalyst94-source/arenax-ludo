@@ -3,190 +3,279 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ArenaX | Ludo Star Pro Ultimate</title>
+  <title>Ludo Premium - Elite Multiplayer Arena</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap');
-    body { font-family: 'Outfit', sans-serif; }
+    body { font-family: 'Outfit', sans-serif; background-color: #070614; color: #f8fafc; overflow-x: hidden; }
 
-    /* Elite Glossy 3D Tokens */
+    /* 3D Glossy Pawns */
     .pawn {
-      width: 26px;
-      height: 26px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 900;
       color: white;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 2px 3px rgba(255,255,255,0.7), inset 0 -2px 3px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.7), inset 0 2px 4px rgba(255,255,255,0.8), inset 0 -2px 4px rgba(0,0,0,0.5);
       position: absolute;
-      z-index: 20;
+      z-index: 30;
+      transform: translate(-50%, -50%);
     }
-    .pawn:hover { transform: scale(1.3) translateY(-3px); filter: brightness(1.2); }
-    .pawn.highlight { animation: proGlow 0.8s infinite alternate; }
-
+    .pawn:hover { transform: translate(-50%, -50%) scale(1.3) translateY(-4px); filter: brightness(1.2); }
     .pawn-red { background: radial-gradient(circle at 35% 35%, #f87171, #dc2626 70%, #991b1b); border: 2px solid #fee2e2; }
     .pawn-green { background: radial-gradient(circle at 35% 35%, #4ade80, #16a34a 70%, #166534); border: 2px solid #dcfce7; }
     .pawn-yellow { background: radial-gradient(circle at 35% 35%, #facc15, #ca8a04 70%, #854d0e); border: 2px solid #fef9c3; }
     .pawn-blue { background: radial-gradient(circle at 35% 35%, #60a5fa, #2563eb 70%, #1e40af); border: 2px solid #eff6ff; }
 
-    @keyframes proGlow {
-      0% { transform: scale(1); box-shadow: 0 0 8px #fff, 0 0 15px currentColor; }
-      100% { transform: scale(1.18); box-shadow: 0 0 16px #fff, 0 0 25px currentColor; }
-    }
-
     ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.4); }
     ::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.4); border-radius: 10px; }
   </style>
 </head>
-<body class="bg-[#070913] text-slate-100 min-h-screen flex flex-col justify-between selection:bg-purple-600 selection:text-white">
+<body class="min-h-screen flex flex-col justify-between selection:bg-purple-600 selection:text-white">
 
   <!-- TOP HEADER -->
-  <header class="px-6 py-3.5 border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-xl flex justify-between items-center max-w-7xl mx-auto w-full shadow-2xl z-50">
+  <header class="px-6 py-3 bg-[#0d0b21]/80 backdrop-blur-xl border-b border-purple-500/20 flex justify-between items-center z-50 shadow-2xl">
     <div class="flex items-center gap-3">
-      <div class="w-3.5 h-3.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-[0_0_12px_#ec4899] animate-pulse"></div>
-      <h1 class="text-lg font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-500">ARENAX <span class="text-white font-light text-xs tracking-normal px-2.5 py-1 bg-purple-500/10 border border-purple-500/20 rounded-xl">LUDO STAR ELITE</span></h1>
+      <div class="text-xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 flex items-center gap-2">
+        👑 LUDO <span class="text-white text-xs px-2 py-0.5 bg-purple-600/30 border border-purple-500/40 rounded-full font-bold">PREMIUM</span>
+      </div>
     </div>
-    <div id="room-info" class="hidden text-xs bg-slate-900/90 border border-slate-800 px-4 py-2 rounded-2xl flex items-center gap-4 shadow-inner">
-      <span class="text-slate-400">Room: <strong id="display-room-code" class="text-purple-400 font-mono tracking-wider text-sm">---</strong></span>
-      <button onclick="copyInviteLink()" class="bg-purple-600 hover:bg-purple-500 transition px-3 py-1.5 rounded-xl text-[11px] font-extrabold shadow-lg shadow-purple-600/30 cursor-pointer">Copy Link 🔗</button>
+    
+    <!-- Mode Nav Tabs -->
+    <div class="hidden md:flex items-center bg-[#070514] p-1.5 rounded-2xl border border-purple-500/20 gap-1 shadow-inner">
+      <button class="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-xs font-extrabold rounded-xl shadow-md">🎲 CLASSIC</button>
+      <button class="px-5 py-2 text-slate-400 hover:text-white text-xs font-bold rounded-xl transition">⚡ QUICK PLAY</button>
+      <button class="px-5 py-2 text-slate-400 hover:text-white text-xs font-bold rounded-xl transition">🔒 PRIVATE ROOM</button>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2 bg-[#120f2e] border border-yellow-500/30 px-4 py-1.5 rounded-2xl shadow-lg">
+        <span class="text-yellow-400 text-sm">🪙</span>
+        <span id="coin-balance" class="font-black text-sm text-yellow-300">2,450</span>
+        <button class="w-5 h-5 bg-green-500 hover:bg-green-400 text-slate-950 font-black rounded-full text-xs flex items-center justify-center transition cursor-pointer">+</button>
+      </div>
+      <button class="p-2.5 bg-[#120f2e] border border-purple-500/20 hover:border-purple-500 rounded-2xl text-slate-300 relative transition">
+        🔔 <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[9px] font-black flex items-center justify-center text-white">3</span>
+      </button>
+      <button class="p-2.5 bg-[#120f2e] border border-purple-500/20 hover:border-purple-500 rounded-2xl text-slate-350 transition">⚙️</button>
     </div>
   </header>
 
   <!-- LOBBY SCREEN -->
-  <main id="lobby-screen" class="max-w-md w-full mx-auto p-8 my-auto bg-slate-900/50 border border-slate-800/80 backdrop-blur-3xl rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.8)] space-y-6">
+  <main id="lobby-screen" class="max-w-md w-full mx-auto p-8 my-auto bg-[#0d0b21]/90 border border-purple-500/30 backdrop-blur-3xl rounded-[2.5rem] shadow-[0_0_60px_rgba(147,51,234,0.3)] space-y-6">
     <div class="text-center space-y-2">
-      <h2 class="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400">Private Battle Arena</h2>
-      <p class="text-xs text-slate-400 font-medium">Enter your battle tag to launch the elite match</p>
+      <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-200 to-pink-400">Join Elite Match</h2>
+      <p class="text-xs text-slate-400">Enter battle name & room code to start</p>
     </div>
     <div class="space-y-4">
       <div>
-        <label class="text-xs font-bold text-slate-300 tracking-wide">Player Battle Name</label>
-        <input id="username-input" type="text" placeholder="e.g. CyberKing" class="w-full bg-slate-950/80 border border-slate-800/90 rounded-2xl p-4 text-sm text-slate-200 focus:outline-none focus:border-purple-500 transition mt-1.5 shadow-inner">
+        <label class="text-xs font-bold text-purple-300">Your Battle Name</label>
+        <input id="username-input" type="text" placeholder="e.g. Usama" value="Usama" class="w-full bg-[#070514] border border-purple-500/30 rounded-2xl p-4 text-sm text-slate-200 focus:outline-none focus:border-purple-500 transition mt-1.5 shadow-inner">
       </div>
       <div>
-        <label class="text-xs font-bold text-slate-300 tracking-wide">Room Code <span class="text-slate-500 font-normal">(Leave empty to create)</span></label>
-        <input id="room-input" type="text" placeholder="e.g. ARENA99" class="w-full bg-slate-950/80 border border-slate-800/90 rounded-2xl p-4 text-sm text-slate-200 font-mono uppercase focus:outline-none focus:border-purple-500 transition mt-1.5 shadow-inner">
-      </div>
-      <div>
-        <label class="text-xs font-bold text-slate-300 tracking-wide">Match Mode</label>
-        <select id="mode-input" class="w-full bg-slate-950/80 border border-slate-800/90 rounded-2xl p-4 text-sm text-slate-200 focus:outline-none focus:border-purple-500 transition mt-1.5">
-          <option value="2">1v1 Duel (2 Players)</option>
-          <option value="4" selected>Classic 4-Player War</option>
-        </select>
+        <label class="text-xs font-bold text-purple-300">Room Code</label>
+        <input id="room-input" type="text" placeholder="e.g. ABCD1234" value="ABCD1234" class="w-full bg-[#070514] border border-purple-500/30 rounded-2xl p-4 text-sm font-mono text-purple-300 uppercase focus:outline-none focus:border-purple-500 transition mt-1.5 shadow-inner">
       </div>
     </div>
-    <button onclick="joinRoom()" class="w-full py-4 bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 hover:opacity-95 font-black uppercase tracking-widest rounded-2xl text-xs shadow-xl shadow-purple-600/40 transition transform active:scale-95 cursor-pointer">LAUNCH ARENA 🎲</button>
+    <button onclick="joinRoom()" class="w-full py-4 bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 hover:opacity-95 font-black uppercase tracking-widest rounded-2xl text-xs shadow-xl shadow-purple-600/40 transition transform active:scale-95 cursor-pointer">START GAME 🎲</button>
   </main>
 
-  <!-- GAMEPLAY & CHAT SCREEN -->
-  <main id="game-screen" class="max-w-7xl w-full mx-auto p-4 hidden grid grid-cols-1 lg:grid-cols-3 gap-6 my-auto">
+  <!-- GAMEPLAY SCREEN -->
+  <main id="game-screen" class="max-w-7xl w-full mx-auto p-4 hidden grid grid-cols-1 lg:grid-cols-4 gap-6 my-auto">
     
-    <!-- Ludo Board Container -->
-    <div class="lg:col-span-2 bg-slate-900/30 border border-slate-800/60 backdrop-blur-2xl rounded-[2.5rem] p-6 flex flex-col items-center justify-between space-y-4 shadow-2xl">
-      <div class="flex justify-between items-center w-full bg-slate-950/70 px-5 py-3 rounded-2xl border border-slate-800/60 shadow-inner">
-        <span id="turn-banner" class="text-xs md:text-sm font-extrabold text-purple-400 flex items-center gap-2.5">
-          <span class="w-2.5 h-2.5 rounded-full bg-purple-500 animate-ping"></span> Match Active. Roll Dice!
-        </span>
-        <div class="flex items-center gap-3">
-          <span id="my-color-badge" class="text-[11px] px-3 py-1 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-xl font-bold">Color: Red</span>
-          <button onclick="toggleVoice()" class="px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-xs font-bold rounded-xl transition cursor-pointer">🎙️ Voice</button>
+    <!-- LEFT SIDEBAR: Game Info & Chat -->
+    <div class="space-y-4 flex flex-col">
+      <!-- GAME INFO BOX -->
+      <div class="bg-[#0d0b21]/80 border border-purple-500/20 backdrop-blur-2xl rounded-3xl p-5 space-y-3 shadow-xl">
+        <div class="flex items-center gap-2 text-xs font-bold text-purple-400 border-b border-purple-500/20 pb-2">
+          ℹ️ GAME INFO
+        </div>
+        <div class="flex justify-between items-center text-xs">
+          <span class="text-slate-400">ROOM CODE</span>
+          <span id="display-room-code" class="font-mono text-purple-300 font-extrabold tracking-wider bg-purple-500/10 px-2.5 py-1 rounded-xl border border-purple-500/20">ABCD1234</span>
+        </div>
+        <div class="flex justify-between items-center text-xs">
+          <span class="text-slate-400">GAME MODE</span>
+          <span class="text-slate-200 font-bold">Classic</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <div class="bg-[#070514] p-2.5 rounded-2xl border border-purple-500/10 text-center">
+            <div class="text-[10px] text-slate-500 font-bold">TIME</div>
+            <div class="text-xs font-extrabold text-slate-200">⏱️ 10:00</div>
+          </div>
+          <div class="bg-[#070514] p-2.5 rounded-2xl border border-purple-500/10 text-center">
+            <div class="text-[10px] text-slate-500 font-bold">TURN</div>
+            <div id="turn-indicator-text" class="text-xs font-extrabold text-blue-400">🔵 Blue</div>
+          </div>
         </div>
       </div>
 
-      <!-- PROFESSIONAL SVG LUDO BOARD -->
-      <div class="relative w-full max-w-[460px] aspect-square bg-[#0b0f19] border-4 border-slate-800 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.9)] overflow-hidden flex items-center justify-center">
+      <!-- CHAT BOX -->
+      <div class="bg-[#0d0b21]/80 border border-purple-500/20 backdrop-blur-2xl rounded-3xl p-4 flex-1 flex flex-col justify-between h-[300px] shadow-xl">
+        <div class="flex justify-between items-center border-b border-purple-500/20 pb-2">
+          <span class="text-xs font-black text-purple-300 flex items-center gap-2">💬 CHAT</span>
+          <span class="text-[10px] text-slate-400 cursor-pointer hover:text-white">Hide</span>
+        </div>
+        <div id="chat-messages" class="flex-1 overflow-y-auto space-y-2.5 py-2 text-xs pr-1">
+          <div class="p-2.5 bg-[#070514] rounded-xl border border-purple-500/10"><strong class="text-red-400">Ali:</strong> Good luck! <span class="text-[9px] text-slate-500 float-right">10:30 PM</span></div>
+          <div class="p-2.5 bg-[#070514] rounded-xl border border-purple-500/10"><strong class="text-green-400">Sara:</strong> Thanks! You too <span class="text-[9px] text-slate-500 float-right">10:31 PM</span></div>
+        </div>
+        <div class="flex gap-2 pt-2 border-t border-purple-500/20">
+          <input id="msg-input" type="text" placeholder="Type a message..." class="flex-1 bg-[#070514] border border-purple-500/20 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-purple-500 shadow-inner">
+          <button onclick="sendChatMessage()" class="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-xs font-black rounded-xl shadow-md transition cursor-pointer">🚀</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER LUDO BOARD & CONTROLS -->
+    <div class="lg:col-span-2 bg-[#0d0b21]/50 border border-purple-500/20 backdrop-blur-2xl rounded-[2.5rem] p-5 flex flex-col items-center justify-between shadow-2xl space-y-4">
+      
+      <!-- BOARD CONTAINER -->
+      <div class="relative w-full max-w-[430px] aspect-square bg-[#070514] border-4 border-purple-500/30 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.9)] overflow-hidden flex items-center justify-center">
         <svg viewBox="0 0 600 600" class="w-full h-full drop-shadow-2xl">
-          <!-- Outer Board Background -->
-          <rect width="600" height="600" fill="#0f172a" />
+          <rect width="600" height="600" fill="#0b091a" />
           
-          <!-- Yard Bases -->
+          <!-- Yards -->
           <rect x="0" y="0" width="240" height="240" fill="#dc2626" opacity="0.9" />
           <rect x="360" y="0" width="240" height="240" fill="#16a34a" opacity="0.9" />
           <rect x="0" y="360" width="240" height="240" fill="#ca8a04" opacity="0.9" />
           <rect x="360" y="360" width="240" height="240" fill="#2563eb" opacity="0.9" />
 
-          <!-- Yard Inner White Boxes -->
-          <rect x="30" y="30" width="180" height="180" rx="16" fill="#0f172a" opacity="0.4" />
-          <rect x="390" y="30" width="180" height="180" rx="16" fill="#0f172a" opacity="0.4" />
-          <rect x="30" y="390" width="180" height="180" rx="16" fill="#0f172a" opacity="0.4" />
-          <rect x="390" y="390" width="180" height="180" rx="16" fill="#0f172a" opacity="0.4" />
+          <!-- Inner Yard Bases -->
+          <rect x="30" y="30" width="180" height="180" rx="16" fill="#0b091a" opacity="0.5" />
+          <rect x="390" y="30" width="180" height="180" rx="16" fill="#0b091a" opacity="0.5" />
+          <rect x="30" y="390" width="180" height="180" rx="16" fill="#0b091a" opacity="0.5" />
+          <rect x="390" y="390" width="180" height="180" rx="16" fill="#0b091a" opacity="0.5" />
 
-          <!-- Tracks & Home Paths -->
-          <!-- Red Home Stretch -->
+          <!-- Home Tracks -->
           <rect x="40" y="270" width="200" height="60" fill="#dc2626" opacity="0.8" />
-          <!-- Green Home Stretch -->
           <rect x="270" y="40" width="60" height="200" fill="#16a34a" opacity="0.8" />
-          <!-- Blue Home Stretch -->
           <rect x="360" y="270" width="200" height="60" fill="#2563eb" opacity="0.8" />
-          <!-- Yellow Home Stretch -->
           <rect x="270" y="360" width="60" height="200" fill="#ca8a04" opacity="0.8" />
 
-          <!-- Center Winning Home -->
+          <!-- Center Triangles -->
           <polygon points="300,300 240,240 240,360" fill="#dc2626" />
           <polygon points="300,300 240,240 360,240" fill="#16a34a" />
           <polygon points="300,300 360,240 360,360" fill="#2563eb" />
           <polygon points="300,300 240,360 360,360" fill="#ca8a04" />
-
-          <!-- Grid Lines & Cells simulation -->
-          <path d="M240 0v600M360 0v600M0 240h600M0 360h600" stroke="#1e293b" stroke-width="3" />
+          <path d="M240 0v600M360 0v600M0 240h600M0 360h600" stroke="#1c1938" stroke-width="3" />
         </svg>
 
-        <!-- Dynamic HTML Pawns Layer Overlay for Smooth Clicking -->
+        <!-- HTML Pawns Overlay -->
         <div id="pawns-container" class="absolute inset-0 pointer-events-none"></div>
       </div>
 
-      <!-- DICE & ACTION CONTROLS -->
-      <div class="flex items-center justify-between w-full max-w-[460px] bg-slate-950/70 px-6 py-4 rounded-2xl border border-slate-800/60 shadow-lg">
-        <div class="flex items-center gap-4">
-          <div id="dice-display" class="w-16 h-16 bg-slate-900/90 border-2 border-purple-500/80 rounded-2xl flex items-center justify-center text-3xl font-black shadow-lg shadow-purple-500/20 text-purple-300 transform transition hover:scale-105">🎲</div>
+      <!-- BOTTOM INTERACTION BAR (EMOJI, MIC, SOUND, UNDO, DICE, RULES, QUIT) -->
+      <div class="w-full flex items-center justify-between bg-[#070514]/90 p-3 rounded-2xl border border-purple-500/20 shadow-lg">
+        <div class="flex items-center gap-2">
+          <button onclick="sendQuickEmoji('😀')" class="p-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-sm transition cursor-pointer">😀</button>
+          <button id="mic-btn" onclick="toggleVoiceChat()" class="p-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-sm transition cursor-pointer">🎙️</button>
+          <button onclick="toggleSound()" class="p-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-sm transition cursor-pointer">🔊</button>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button onclick="undoMove()" class="px-3.5 py-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer">
+            ↩️ <span class="bg-purple-600 text-white text-[10px] px-1.5 py-0.5 rounded-md">2</span>
+          </button>
+          
+          <!-- DICE ROLLER BUTTON -->
+          <button id="roll-btn" onclick="rollDice()" class="flex items-center gap-3 px-6 py-2.5 bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 hover:opacity-90 rounded-2xl shadow-lg shadow-purple-600/40 transition transform active:scale-95 cursor-pointer">
+            <span id="dice-display" class="text-2xl">🎲</span>
+            <span class="font-black text-xs uppercase tracking-wider">ROLL DICE</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="alert('Rules: Roll 6 to open pawn. Reach center home to win!')" class="p-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-sm transition cursor-pointer">🛡️</button>
+          <button onclick="location.reload()" class="p-2.5 bg-red-950/40 hover:bg-red-900/60 rounded-xl border border-red-500/30 text-sm transition cursor-pointer">🚪</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR: PLAYER CARDS -->
+    <div class="space-y-3.5 flex flex-col justify-center">
+      
+      <!-- Player 1: Ali Khan -->
+      <div class="bg-[#0d0b21]/90 border border-red-500/40 rounded-3xl p-3.5 flex items-center justify-between shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" class="w-12 h-12 rounded-2xl object-cover border-2 border-red-500">
+            <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-red-600 rounded-full border border-white flex items-center justify-center text-[9px] font-black">🔴</span>
+          </div>
           <div>
-            <div class="text-[10px] text-slate-400 uppercase tracking-widest font-extrabold">Dice Roller</div>
-            <div id="dice-status" class="text-xs font-bold text-slate-200">Ready to roll</div>
+            <div class="text-xs font-black text-slate-100">Ali Khan</div>
+            <div class="text-[11px] font-bold text-yellow-400 flex items-center gap-1">🪙 1,250</div>
           </div>
         </div>
-        <button id="roll-btn" onclick="rollDice()" class="px-8 py-4 bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 hover:opacity-90 font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-purple-600/40 transition transform active:scale-95 cursor-pointer">ROLL DICE</button>
+        <div class="text-red-400 font-bold text-xs">📶</div>
       </div>
+
+      <!-- Player 2: Sara Malik -->
+      <div class="bg-[#0d0b21]/90 border border-green-500/40 rounded-3xl p-3.5 flex items-center justify-between shadow-[0_0_20px_rgba(34,197,94,0.2)]">
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop&crop=faces" class="w-12 h-12 rounded-2xl object-cover border-2 border-green-500">
+            <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-600 rounded-full border border-white flex items-center justify-center text-[9px] font-black">🟢</span>
+          </div>
+          <div>
+            <div class="text-xs font-black text-slate-100">Sara Malik</div>
+            <div class="text-[11px] font-bold text-yellow-400 flex items-center gap-1">🪙 980</div>
+          </div>
+        </div>
+        <div class="text-green-400 font-bold text-xs">📶</div>
+      </div>
+
+      <!-- Player 3: YOU (Usama) -->
+      <div class="bg-[#0d0b21]/90 border-2 border-blue-500 rounded-3xl p-3.5 flex items-center justify-between shadow-[0_0_25px_rgba(59,130,246,0.4)]">
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop&crop=faces" class="w-12 h-12 rounded-2xl object-cover border-2 border-blue-500">
+            <span class="absolute -top-2 -left-2 bg-blue-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md">YOU</span>
+            <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-600 rounded-full border border-white flex items-center justify-center text-[9px] font-black">🔵</span>
+          </div>
+          <div>
+            <div id="display-my-name" class="text-xs font-black text-blue-300">Usama</div>
+            <div class="text-[11px] font-bold text-yellow-400 flex items-center gap-1">🪙 2,450</div>
+          </div>
+        </div>
+        <div class="text-blue-400 font-bold text-xs">📶</div>
+      </div>
+
+      <!-- Player 4: Hamza Sajid -->
+      <div class="bg-[#0d0b21]/90 border border-yellow-500/40 rounded-3xl p-3.5 flex items-center justify-between shadow-[0_0_20px_rgba(234,179,8,0.2)]">
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces" class="w-12 h-12 rounded-2xl object-cover border-2 border-yellow-500">
+            <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-yellow-600 rounded-full border border-white flex items-center justify-center text-[9px] font-black">🟡</span>
+          </div>
+          <div>
+            <div class="text-xs font-black text-slate-100">Hamza Sajid</div>
+            <div class="text-[11px] font-bold text-yellow-400 flex items-center gap-1">🪙 760</div>
+          </div>
+        </div>
+        <div class="text-yellow-400 font-bold text-xs">📶</div>
+      </div>
+
     </div>
 
-    <!-- Live Chat & Quick Reactions Sidebar -->
-    <div class="bg-slate-900/30 border border-slate-800/60 backdrop-blur-2xl rounded-[2.5rem] p-5 flex flex-col justify-between h-[580px] shadow-2xl">
-      <div class="border-b border-slate-800/80 pb-3 flex justify-between items-center">
-        <span class="text-xs font-black tracking-wider text-slate-300 flex items-center gap-2">💬 TACTICAL CHAT</span>
-        <span id="player-count" class="text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/30 px-3 py-1 rounded-full font-bold">1 / 4 Players</span>
-      </div>
-
-      <!-- Quick Reaction Emojis -->
-      <div class="grid grid-cols-5 gap-2 py-3 border-b border-slate-800/60">
-        <button onclick="sendQuickEmoji('🔥')" class="p-2.5 bg-slate-950/80 hover:bg-slate-800 border border-slate-800/80 rounded-2xl text-sm transition cursor-pointer shadow-sm">🔥</button>
-        <button onclick="sendQuickEmoji('😎')" class="p-2.5 bg-slate-950/80 hover:bg-slate-800 border border-slate-800/80 rounded-2xl text-sm transition cursor-pointer shadow-sm">😎</button>
-        <button onclick="sendQuickEmoji('👏')" class="p-2.5 bg-slate-950/80 hover:bg-slate-800 border border-slate-800/80 rounded-2xl text-sm transition cursor-pointer shadow-sm">👏</button>
-        <button onclick="sendQuickEmoji('😂')" class="p-2.5 bg-slate-950/80 hover:bg-slate-800 border border-slate-800/80 rounded-2xl text-sm transition cursor-pointer shadow-sm">😂</button>
-        <button onclick="sendQuickEmoji('🎯')" class="p-2.5 bg-slate-950/80 hover:bg-slate-800 border border-slate-800/80 rounded-2xl text-sm transition cursor-pointer shadow-sm">🎯</button>
-      </div>
-      
-      <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 py-3 text-xs pr-1"></div>
-
-      <div class="flex gap-2 pt-3 border-t border-slate-800/80">
-        <input id="msg-input" type="text" placeholder="Type message..." class="flex-1 bg-slate-950/90 border border-slate-800/90 rounded-2xl px-4 py-3 text-xs text-slate-200 focus:outline-none focus:border-purple-500 transition shadow-inner">
-        <button onclick="sendChatMessage()" class="px-5 py-3 bg-purple-600 hover:bg-purple-500 text-xs font-black rounded-2xl shadow-md transition cursor-pointer">Send</button>
-      </div>
-    </div>
   </main>
 
-  <footer class="p-4 text-center text-xs text-slate-600 font-medium">
-    ArenaX Elite Multiplayer Engine &copy; 2026
+  <footer class="p-3 text-center text-[11px] text-slate-600 font-medium">
+    Ludo Premium Multiplayer Engine &copy; 2026
   </footer>
 
   <script>
     const socket = io();
-    let currentRoom = "", myUsername = "", currentDice = 0, currentTurnColor = "red";
+    let currentRoom = "", myUsername = "Usama", currentDice = 0, currentTurnColor = "blue";
+    let localStream = null, peerConnection = null;
 
     let gameState = {
       red: [-1, -1, -1, -1],
@@ -195,21 +284,32 @@
       blue: [-1, -1, -1, -1]
     };
 
-    // Yard coordinates mapping for 4 pawns inside each base box (relative percentages on board)
     const yardCoords = {
-      red: [{x: 70, y: 70}, {x: 140, y: 70}, {x: 70, y: 140}, {x: 140, y: 140}],
-      green: [{x: 430, y: 70}, {x: 500, y: 70}, {x: 430, y: 140}, {x: 500, y: 140}],
-      yellow: [{x: 70, y: 430}, {x: 140, y: 430}, {x: 70, y: 500}, {x: 140, y: 500}],
-      blue: [{x: 430, y: 430}, {x: 500, y: 430}, {x: 430, y: 500}, {x: 500, y: 500}]
+      red: [{x: 28, y: 28}, {x: 42, y: 28}, {x: 28, y: 42}, {x: 42, y: 42}],
+      green: [{x: 75, y: 28}, {x: 89, y: 28}, {x: 75, y: 42}, {x: 89, y: 42}],
+      yellow: [{x: 28, y: 75}, {x: 42, y: 75}, {x: 28, y: 89}, {x: 42, y: 89}],
+      blue: [{x: 75, y: 75}, {x: 89, y: 75}, {x: 75, y: 89}, {x: 89, y: 89}]
     };
 
     window.onload = () => {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('room')) {
-        document.getElementById('room-input').value = params.get('room');
-      }
       renderPawns();
     };
+
+    function joinRoom() {
+      myUsername = document.getElementById('username-input').value.trim() || 'Usama';
+      currentRoom = document.getElementById('room-input').value.trim().toUpperCase() || 'ABCD1234';
+
+      socket.emit('join_room', { roomId: currentRoom, username: myUsername });
+
+      document.getElementById('lobby-screen').style.display = 'none';
+      const gameScreen = document.getElementById('game-screen');
+      gameScreen.classList.remove('hidden');
+      gameScreen.style.display = 'grid';
+
+      document.getElementById('display-room-code').innerText = currentRoom;
+      document.getElementById('display-my-name').innerText = myUsername;
+      addSystemMessage(`Connected to Room ${currentRoom}`);
+    }
 
     function renderPawns() {
       const container = document.getElementById('pawns-container');
@@ -223,82 +323,36 @@
           pawn.innerText = idx + 1;
           pawn.onclick = () => handlePawnClick(color, idx);
 
-          if (currentTurnColor === color && currentDice > 0) {
-            pawn.classList.add('highlight');
-          }
-
-          let coords = {x: 100, y: 100};
-          if (pos === -1) {
-            coords = yardCoords[color][idx];
-          } else {
-            // Simple path simulation offset for demo movement
-            coords = { x: 270 + (idx * 15), y: 270 + (pos * 3) };
-          }
-
-          pawn.style.left = `${coords.x}px`;
-          pawn.style.top = `${coords.y}px`;
+          let coords = pos === -1 ? yardCoords[color][idx] : { x: 45 + (idx * 3), y: 45 + (pos * 1) };
+          pawn.style.left = `${coords.x}%`;
+          pawn.style.top = `${coords.y}%`;
           container.appendChild(pawn);
         });
       });
     }
 
-    function joinRoom() {
-      myUsername = document.getElementById('username-input').value.trim() || 'Player_' + Math.floor(Math.random()*1000);
-      currentRoom = document.getElementById('room-input').value.trim().toUpperCase() || 'ELITE_' + Math.floor(Math.random()*9000 + 1000);
-      const maxPlayers = document.getElementById('mode-input').value;
-
-      socket.emit('create_or_join_room', { roomId: currentRoom, maxPlayers, username: myUsername });
-
-      document.getElementById('lobby-screen').style.display = 'none';
-      const gameScreen = document.getElementById('game-screen');
-      gameScreen.classList.remove('hidden');
-      gameScreen.style.display = 'grid';
-
-      document.getElementById('room-info').classList.remove('hidden');
-      document.getElementById('display-room-code').innerText = currentRoom;
-      addSystemMessage(`Connected to Room ${currentRoom} as ${myUsername}`);
-    }
-
     function rollDice() {
       currentDice = Math.floor(Math.random() * 6) + 1;
-      document.getElementById('dice-display').innerText = currentDice;
-      document.getElementById('dice-status').innerText = `Rolled ${currentDice}. Select pawn!`;
-      renderPawns();
+      document.getElementById('dice-display').innerText = ['⚀','⚁','⚂','⚃','⚄','⚅'][currentDice - 1];
+      addSystemMessage(`Rolled a ${currentDice}! Select your pawn.`);
     }
 
     function handlePawnClick(color, index) {
-      if (color !== currentTurnColor) {
-        alert("Not your turn!");
-        return;
-      }
       if (currentDice === 0) {
         alert("Roll the dice first!");
         return;
       }
-
       let pos = gameState[color][index];
-      if (pos === -1) {
-        if (currentDice === 6) {
-          gameState[color][index] = 0;
-          addSystemMessage(`${color.toUpperCase()} pawn ${index+1} entered board!`);
-        } else {
-          alert("Need a 6 to open pawn!");
-          return;
-        }
-      } else {
+      if (pos === -1 && currentDice === 6) {
+        gameState[color][index] = 0;
+      } else if (pos !== -1) {
         gameState[color][index] = Math.min(50, pos + currentDice);
-        addSystemMessage(`${color.toUpperCase()} pawn ${index+1} moved ${currentDice} steps.`);
+      } else {
+        alert("Need a 6 to open pawn!");
+        return;
       }
-
       currentDice = 0;
       document.getElementById('dice-display').innerText = '🎲';
-      document.getElementById('dice-status').innerText = 'Move done. Next turn!';
-      
-      const colors = ['red', 'green', 'yellow', 'blue'];
-      let nextIdx = (colors.indexOf(currentTurnColor) + 1) % colors.length;
-      currentTurnColor = colors[nextIdx];
-      document.getElementById('turn-banner').innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-ping"></span> ${currentTurnColor.toUpperCase()}'s Turn`;
-
       renderPawns();
     }
 
@@ -322,24 +376,109 @@
 
     function appendChat(user, text) {
       const box = document.getElementById('chat-messages');
-      box.innerHTML += `<div class="p-3 bg-slate-950/80 rounded-2xl border border-slate-800/80 shadow-sm"><strong class="text-purple-400">${user}:</strong> ${text}</div>`;
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      box.innerHTML += `<div class="p-2.5 bg-[#070514] rounded-xl border border-purple-500/10"><strong class="text-purple-300">${user}:</strong> ${text} <span class="text-[9px] text-slate-500 float-right">${timeStr}</span></div>`;
       box.scrollTop = box.scrollHeight;
     }
 
     function addSystemMessage(msg) {
       const box = document.getElementById('chat-messages');
-      box.innerHTML += `<div class="p-1 text-[11px] text-slate-500 text-center font-mono tracking-tight">${msg}</div>`;
+      box.innerHTML += `<div class="p-1 text-[10px] text-slate-500 text-center font-mono">${msg}</div>`;
       box.scrollTop = box.scrollHeight;
     }
 
-    function copyInviteLink() {
-      const inviteUrl = `${window.location.origin}?room=${currentRoom}`;
-      navigator.clipboard.writeText(inviteUrl);
-      alert("Invite Link Copied!");
+    // WEBTRC REAL VOICE CHAT INTEGRATION
+    async function toggleVoiceChat() {
+      const micBtn = document.getElementById('mic-btn');
+      if (!localStream) {
+        try {
+          localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+          micBtn.style.background = '#22c55e';
+          alert("🎙️ Voice Chat Connected! You can now talk with other players.");
+          
+          // Setup WebRTC connection peers here via socket signaling
+          setupWebRTC();
+        } catch (err) {
+          alert("Microphone permission denied or not available.");
+        }
+      } else {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+        micBtn.style.background = '#120f2e';
+        alert("🎙️ Voice Chat Disconnected.");
+      }
     }
 
-    function toggleVoice() {
-      alert("Voice Channel Active!");
+    function setupWebRTC() {
+      const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+      peerConnection = new RTCPeerConnection(configuration);
+
+      localStream.getTracks().forEach(track => {
+        peerConnection.addTrack(track, localStream);
+      });
+
+      peerConnection.ontrack = (event) => {
+        const remoteAudio = document.createElement('audio');
+        remoteAudio.srcObject = event.streams[0];
+        remoteAudio.autoplay = true;
+        document.body.appendChild(remoteAudio);
+      };
+
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          socket.emit('webrtc_ice', { room: currentRoom, candidate: event.candidate });
+        }
+      };
+
+      peerConnection.createOffer().then(offer => {
+        return peerConnection.setLocalDescription(offer);
+      }).then(() => {
+        socket.emit('webrtc_offer', { room: currentRoom, offer: peerConnection.localDescription });
+      });
+
+      socket.on('webrtc_offer', async (data) => {
+        if (!peerConnection) setupReceiverPeer(configuration);
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        socket.emit('webrtc_answer', { room: currentRoom, answer: answer });
+      });
+
+      socket.on('webrtc_answer', async (data) => {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+      });
+
+      socket.on('webrtc_ice', async (data) => {
+        if (peerConnection) {
+          await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+        }
+      });
+    }
+
+    function setupReceiverPeer(config) {
+      peerConnection = new RTCPeerConnection(config);
+      if (localStream) {
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+      }
+      peerConnection.ontrack = (event) => {
+        const remoteAudio = document.createElement('audio');
+        remoteAudio.srcObject = event.streams[0];
+        remoteAudio.autoplay = true;
+        document.body.appendChild(remoteAudio);
+      };
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          socket.emit('webrtc_ice', { room: currentRoom, candidate: event.candidate });
+        }
+      };
+    }
+
+    function undoMove() {
+      alert("Undo action requested.");
+    }
+
+    function toggleSound() {
+      alert("Sound Toggled.");
     }
   </script>
 </body>

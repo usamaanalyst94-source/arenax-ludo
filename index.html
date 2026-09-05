@@ -11,8 +11,8 @@
 
     /* Elite Glossy 3D Tokens */
     .pawn {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
@@ -74,7 +74,7 @@
     <div class="flex items-center gap-4">
       <div class="flex items-center gap-2 bg-[#120f2e] border border-yellow-500/30 px-4 py-1.5 rounded-2xl shadow-lg">
         <span class="text-yellow-400 text-sm">🪙</span>
-        <span id="coin-balance" class="font-black text-sm text-yellow-300">2,450</span>
+        <span id="coin-balance" class="font-black text-sm text-yellow-300">16,950</span>
         <button onclick="addCoins()" class="w-5 h-5 bg-green-500 hover:bg-green-400 text-slate-950 font-black rounded-full text-xs flex items-center justify-center transition cursor-pointer">+</button>
       </div>
       <button onclick="alert('No new notifications')" class="p-2.5 bg-[#120f2e] border border-purple-500/20 hover:border-purple-500 rounded-2xl text-slate-300 relative transition cursor-pointer">
@@ -101,7 +101,7 @@
         </div>
         <div class="flex justify-between items-center text-xs">
           <span class="text-slate-400">GAME MODE</span>
-          <span id="display-game-mode" class="text-slate-200 font-bold">Classic</span>
+          <span id="display-game-mode" class="text-slate-200 font-bold">Private (ROOM777)</span>
         </div>
         <div class="grid grid-cols-2 gap-2 pt-1">
           <div class="bg-[#070514] p-2.5 rounded-2xl border border-purple-500/10 text-center">
@@ -269,10 +269,9 @@
   </footer>
 
   <script>
-    // Game State Management
     let currentDice = 0;
     let turnOrder = ['blue', 'yellow', 'green', 'red'];
-    let currentTurnIndex = 0; // Starts with Blue (Usama)
+    let currentTurnIndex = 0;
 
     let gameState = {
       red: [-1, -1, -1, -1],
@@ -281,12 +280,12 @@
       blue: [-1, -1, -1, -1]
     };
 
-    // Yard base coordinates inside the board
+    // Exact Home Yard Coordinates for 4 Pawns per player inside the base boxes
     const yardCoords = {
-      red: [{x: 14, y: 14}, {x: 26, y: 14}, {x: 14, y: 26}, {x: 26, y: 26}],
-      green: [{x: 74, y: 14}, {x: 86, y: 14}, {x: 74, y: 26}, {x: 86, y: 26}],
-      yellow: [{x: 14, y: 74}, {x: 26, y: 74}, {x: 14, y: 86}, {x: 26, y: 86}],
-      blue: [{x: 74, y: 74}, {x: 86, y: 74}, {x: 74, y: 86}, {x: 86, y: 86}]
+      red: [{x: 13, y: 13}, {x: 23, y: 13}, {x: 13, y: 23}, {x: 23, y: 23}],
+      green: [{x: 77, y: 13}, {x: 87, y: 13}, {x: 77, y: 23}, {x: 87, y: 23}],
+      yellow: [{x: 13, y: 77}, {x: 23, y: 77}, {x: 13, y: 87}, {x: 23, y: 87}],
+      blue: [{x: 77, y: 77}, {x: 87, y: 77}, {x: 77, y: 87}, {x: 87, y: 87}]
     };
 
     const diceFaces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
@@ -323,13 +322,21 @@
         gameState[color].forEach((pos, idx) => {
           const pawn = document.createElement('div');
           pawn.className = `pawn pawn-${color} pointer-events-auto`;
-          if (turnOrder[currentTurnIndex] === color && currentDice > 0) {
-            pawn.classList.add('highlight');
+          
+          let activeColor = turnOrder[currentTurnIndex];
+          let hasActive = gameState[activeColor].some(p => p !== -1);
+          
+          // Highlight valid movable pawns
+          if (activeColor === color && currentDice > 0) {
+            if (pos !== -1 || currentDice === 6) {
+              pawn.classList.add('highlight');
+            }
           }
+
           pawn.innerText = idx + 1;
           pawn.onclick = () => handlePawnClick(color, idx);
 
-          let coords = pos === -1 ? yardCoords[color][idx] : { x: 45 + (idx * 3), y: 45 + (pos * 1) };
+          let coords = pos === -1 ? yardCoords[color][idx] : { x: 45 + (idx * 2), y: 45 + (pos * 0.8) };
           pawn.style.left = `${coords.x}%`;
           pawn.style.top = `${coords.y}%`;
           container.appendChild(pawn);
@@ -343,7 +350,6 @@
         return;
       }
 
-      const diceBtn = document.getElementById('roll-btn');
       const diceDisplay = document.getElementById('dice-display');
       diceDisplay.classList.add('rolling');
 
@@ -353,8 +359,22 @@
         diceDisplay.classList.remove('rolling');
 
         let activeColor = turnOrder[currentTurnIndex];
-        addSystemMessage(`${activeColor.toUpperCase()} rolled a ${currentDice}! Click your pawn to move.`);
-        renderPawns();
+        let hasActivePawns = gameState[activeColor].some(p => p !== -1);
+
+        // If player rolled non-6 and has no pawns out, auto-pass turn after 1.2s so it doesn't get stuck!
+        if (currentDice !== 6 && !hasActivePawns) {
+          addSystemMessage(`${activeColor.toUpperCase()} rolled a ${currentDice}. No active pawns! Passing turn...`);
+          setTimeout(() => {
+            currentDice = 0;
+            document.getElementById('dice-display').innerText = '🎲';
+            currentTurnIndex = (currentTurnIndex + 1) % turnOrder.length;
+            updateTurnUI();
+            renderPawns();
+          }, 1200);
+        } else {
+          addSystemMessage(`${activeColor.toUpperCase()} rolled a ${currentDice}! Click your highlighted pawn to move.`);
+          renderPawns();
+        }
       }, 400);
     }
 
@@ -371,16 +391,19 @@
       }
 
       let pos = gameState[color][index];
-      if (pos === -1 && currentDice === 6) {
-        gameState[color][index] = 0; // Open pawn
-      } else if (pos !== -1) {
-        gameState[color][index] = Math.min(50, pos + currentDice);
+      
+      if (pos === -1) {
+        if (currentDice === 6) {
+          gameState[color][index] = 0; // Open pawn on 6
+        } else {
+          alert("You need a 6 to open this pawn!");
+          return;
+        }
       } else {
-        alert("Need a 6 on the dice to open this pawn!");
-        return;
+        gameState[color][index] = Math.min(50, pos + currentDice);
       }
 
-      // Reset dice & pass turn to next player
+      // Reset dice and pass turn to next player
       currentDice = 0;
       document.getElementById('dice-display').innerText = '🎲';
       currentTurnIndex = (currentTurnIndex + 1) % turnOrder.length;
@@ -437,7 +460,7 @@
     }
 
     function addCoins() {
-      let bal = parseInt(document.getElementById('coin-balance').innerText.replace(',', '')) + 500;
+      let bal = parseInt(document.getElementById('coin-balance').innerText.replace(/,/g, '')) + 500;
       document.getElementById('coin-balance').innerText = bal.toLocaleString();
     }
   </script>

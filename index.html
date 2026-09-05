@@ -9,7 +9,6 @@
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap');
     body { font-family: 'Outfit', sans-serif; background-color: #070514; color: #f8fafc; overflow-x: hidden; }
 
-    /* Elite Glossy 3D Tokens */
     .pawn {
       width: 26px;
       height: 26px;
@@ -56,7 +55,6 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-purple-600 selection:text-white">
 
-  <!-- TOP HEADER -->
   <header class="px-6 py-3 bg-[#0d0b21]/90 backdrop-blur-xl border-b border-purple-500/20 flex justify-between items-center z-50 shadow-2xl">
     <div class="flex items-center gap-3">
       <div class="text-xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 flex items-center gap-2 cursor-pointer" onclick="location.reload()">
@@ -64,7 +62,6 @@
       </div>
     </div>
     
-    <!-- Mode Tabs -->
     <div class="hidden md:flex items-center bg-[#070514] p-1.5 rounded-2xl border border-purple-500/20 gap-1 shadow-inner">
       <button id="tab-classic" onclick="switchMode('classic')" class="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-xs font-extrabold rounded-xl shadow-md cursor-pointer transition">🎲 CLASSIC</button>
       <button id="tab-quick" onclick="switchMode('quick')" class="px-5 py-2 text-slate-400 hover:text-white text-xs font-bold rounded-xl cursor-pointer transition">⚡ QUICK PLAY</button>
@@ -84,10 +81,8 @@
     </div>
   </header>
 
-  <!-- MAIN GAME SCREEN -->
   <main class="max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-4 gap-6 my-auto">
     
-    <!-- LEFT SIDEBAR: Game Info & Chat -->
     <div class="space-y-4 flex flex-col">
       <div class="bg-[#0d0b21]/80 border border-purple-500/20 backdrop-blur-2xl rounded-3xl p-5 space-y-3 shadow-xl">
         <div class="flex items-center gap-2 text-xs font-bold text-purple-400 border-b border-purple-500/20 pb-2">
@@ -101,7 +96,7 @@
         </div>
         <div class="flex justify-between items-center text-xs">
           <span class="text-slate-400">GAME MODE</span>
-          <span id="display-game-mode" class="text-slate-200 font-bold">Private (ROOM777)</span>
+          <span id="display-game-mode" class="text-slate-200 font-bold">Classic</span>
         </div>
         <div class="grid grid-cols-2 gap-2 pt-1">
           <div class="bg-[#070514] p-2.5 rounded-2xl border border-purple-500/10 text-center">
@@ -110,12 +105,11 @@
           </div>
           <div class="bg-[#070514] p-2.5 rounded-2xl border border-purple-500/10 text-center">
             <div class="text-[10px] text-slate-500 font-bold">TURN</div>
-            <div id="turn-indicator-text" class="text-xs font-extrabold text-blue-400">🔵 Blue (You)</div>
+            <div id="turn-indicator-text" class="text-xs font-extrabold text-blue-400">🔵 Blue</div>
           </div>
         </div>
       </div>
 
-      <!-- CHAT BOX -->
       <div class="bg-[#0d0b21]/80 border border-purple-500/20 backdrop-blur-2xl rounded-3xl p-4 flex-1 flex flex-col justify-between h-[280px] shadow-xl">
         <div class="flex justify-between items-center border-b border-purple-500/20 pb-2">
           <span class="text-xs font-black text-purple-300 flex items-center gap-2">💬 CHAT</span>
@@ -124,7 +118,6 @@
         <div id="chat-messages" class="flex-1 overflow-y-auto space-y-2.5 py-2 text-xs pr-1">
           <div class="p-2.5 bg-[#070514] rounded-xl border border-purple-500/10"><strong class="text-red-400">Ali:</strong> Good luck! <span class="text-[9px] text-slate-500 float-right">10:30 PM</span></div>
           <div class="p-2.5 bg-[#070514] rounded-xl border border-purple-500/10"><strong class="text-green-400">Sara:</strong> Thanks! You too <span class="text-[9px] text-slate-500 float-right">10:31 PM</span></div>
-          <div class="p-2.5 bg-[#070514] rounded-xl border border-purple-500/10"><strong class="text-yellow-400">Hamza:</strong> Let's play fair! <span class="text-[9px] text-slate-500 float-right">10:31 PM</span></div>
         </div>
         <div class="flex gap-2 pt-2 border-t border-purple-500/20">
           <input id="msg-input" type="text" placeholder="Type a message..." class="flex-1 bg-[#070514] border border-purple-500/20 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-purple-500 shadow-inner" onkeypress="if(event.key==='Enter') sendChatMessage()">
@@ -133,45 +126,34 @@
       </div>
     </div>
 
-    <!-- CENTER LUDO BOARD & CONTROLS -->
     <div class="lg:col-span-2 bg-[#0d0b21]/50 border border-purple-500/20 backdrop-blur-2xl rounded-[2.5rem] p-5 flex flex-col items-center justify-between shadow-2xl space-y-4">
       
-      <!-- LUDO BOARD CONTAINER -->
-      <div class="relative w-full max-w-[430px] aspect-square bg-[#070514] border-4 border-purple-500/30 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.9)] overflow-hidden flex items-center justify-center">
+      <div class="relative w-full max-w-[430px] aspect-square bg-[#0b091a] border-4 border-purple-500/30 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.9)] overflow-hidden flex items-center justify-center">
         <svg viewBox="0 0 600 600" class="w-full h-full drop-shadow-2xl">
-          <rect width="600" height="600" fill="#0b091a" />
-          
-          <!-- Yards -->
-          <rect x="0" y="0" width="240" height="240" fill="#dc2626" opacity="0.9" />
-          <rect x="360" y="0" width="240" height="240" fill="#16a34a" opacity="0.9" />
-          <rect x="0" y="360" width="240" height="240" fill="#ca8a04" opacity="0.9" />
-          <rect x="360" y="360" width="240" height="240" fill="#2563eb" opacity="0.9" />
+          <rect x="0" y="0" width="240" height="240" fill="#dc2626" opacity="0.85" />
+          <rect x="360" y="0" width="240" height="240" fill="#16a34a" opacity="0.85" />
+          <rect x="0" y="360" width="240" height="240" fill="#ca8a04" opacity="0.85" />
+          <rect x="360" y="360" width="240" height="240" fill="#2563eb" opacity="0.85" />
 
-          <!-- Inner Yard Bases -->
-          <rect x="30" y="30" width="180" height="180" rx="16" fill="#0b091a" opacity="0.6" />
-          <rect x="390" y="30" width="180" height="180" rx="16" fill="#0b091a" opacity="0.6" />
-          <rect x="30" y="390" width="180" height="180" rx="16" fill="#0b091a" opacity="0.6" />
-          <rect x="390" y="390" width="180" height="180" rx="16" fill="#0b091a" opacity="0.6" />
+          <rect x="30" y="30" width="180" height="180" rx="16" fill="#070514" />
+          <rect x="390" y="30" width="180" height="180" rx="16" fill="#070514" />
+          <rect x="30" y="390" width="180" height="180" rx="16" fill="#070514" />
+          <rect x="390" y="390" width="180" height="180" rx="16" fill="#070514" />
 
-          <!-- Home Tracks -->
-          <rect x="40" y="270" width="200" height="60" fill="#dc2626" opacity="0.8" />
-          <rect x="270" y="40" width="60" height="200" fill="#16a34a" opacity="0.8" />
-          <rect x="360" y="270" width="200" height="60" fill="#2563eb" opacity="0.8" />
-          <rect x="270" y="360" width="60" height="200" fill="#ca8a04" opacity="0.8" />
+          <rect x="40" y="270" width="200" height="60" fill="#dc2626" opacity="0.7" />
+          <rect x="270" y="40" width="60" height="200" fill="#16a34a" opacity="0.7" />
+          <rect x="360" y="270" width="200" height="60" fill="#2563eb" opacity="0.7" />
+          <rect x="270" y="360" width="60" height="200" fill="#ca8a04" opacity="0.7" />
 
-          <!-- Center Triangles -->
           <polygon points="300,300 240,240 240,360" fill="#dc2626" />
           <polygon points="300,300 240,240 360,240" fill="#16a34a" />
           <polygon points="300,300 360,240 360,360" fill="#2563eb" />
           <polygon points="300,300 240,360 360,360" fill="#ca8a04" />
-          <path d="M240 0v600M360 0v600M0 240h600M0 360h600" stroke="#1c1938" stroke-width="3" />
         </svg>
 
-        <!-- HTML Pawns Overlay -->
         <div id="pawns-container" class="absolute inset-0 pointer-events-none"></div>
       </div>
 
-      <!-- BOTTOM INTERACTION BAR -->
       <div class="w-full flex items-center justify-between bg-[#070514]/90 p-3 rounded-2xl border border-purple-500/20 shadow-lg">
         <div class="flex items-center gap-2">
           <button onclick="sendQuickEmoji('🔥')" class="p-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-sm transition cursor-pointer shadow-sm">🔥</button>
@@ -180,10 +162,6 @@
         </div>
 
         <div class="flex items-center gap-3">
-          <button onclick="alert('Undo move')" class="px-3.5 py-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer">
-            ↩️ <span class="bg-purple-600 text-white text-[10px] px-1.5 py-0.5 rounded-md">2</span>
-          </button>
-          
           <button id="roll-btn" onclick="rollDice()" class="flex items-center gap-3 px-6 py-2.5 bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 hover:opacity-90 rounded-2xl shadow-lg shadow-purple-600/40 transition transform active:scale-95 cursor-pointer">
             <span id="dice-display" class="text-2xl">🎲</span>
             <span class="font-black text-xs uppercase tracking-wider">ROLL DICE</span>
@@ -197,76 +175,48 @@
       </div>
     </div>
 
-    <!-- RIGHT SIDEBAR: PLAYER CARDS WITH DYNAMIC TURN GLOW -->
     <div class="space-y-3.5 flex flex-col justify-center">
-      
-      <!-- Ali Khan (Red) -->
-      <div id="card-red" class="bg-[#0d0b21]/90 border border-red-500/40 rounded-3xl p-3.5 flex items-center justify-between shadow-[0_0_20px_rgba(239,68,68,0.2)] transition-all">
+      <div id="card-red" class="bg-[#0d0b21]/90 border border-red-500/40 rounded-3xl p-3.5 flex items-center justify-between shadow-lg transition-all">
         <div class="flex items-center gap-3">
-          <div class="relative">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" class="w-12 h-12 rounded-2xl object-cover border-2 border-red-500">
-            <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-red-600 rounded-full border border-white flex items-center justify-center text-[9px] font-black">🔴</span>
-          </div>
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" class="w-12 h-12 rounded-2xl object-cover border-2 border-red-500">
           <div>
             <div class="text-xs font-black text-slate-100">Ali Khan</div>
-            <div class="text-[11px] font-bold text-yellow-400 flex items-center gap-1">🪙 1,250</div>
+            <div class="text-[11px] font-bold text-yellow-400">🪙 1,250</div>
           </div>
         </div>
-        <div class="text-red-400 font-bold text-xs">📶</div>
       </div>
 
-      <!-- Sara Malik (Green) -->
-      <div id="card-green" class="bg-[#0d0b21]/90 border border-green-500/40 rounded-3xl p-3.5 flex items-center justify-between shadow-[0_0_20px_rgba(34,197,94,0.2)] transition-all">
+      <div id="card-green" class="bg-[#0d0b21]/90 border border-green-500/40 rounded-3xl p-3.5 flex items-center justify-between shadow-lg transition-all">
         <div class="flex items-center gap-3">
-          <div class="relative">
-            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop&crop=faces" class="w-12 h-12 rounded-2xl object-cover border-2 border-green-500">
-            <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-600 rounded-full border border-white flex items-center justify-center text-[9px] font-black">🟢</span>
-          </div>
+          <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop&crop=faces" class="w-12 h-12 rounded-2xl object-cover border-2 border-green-500">
           <div>
             <div class="text-xs font-black text-slate-100">Sara Malik</div>
-            <div class="text-[11px] font-bold text-yellow-400 flex items-center gap-1">🪙 980</div>
+            <div class="text-[11px] font-bold text-yellow-400">🪙 980</div>
           </div>
         </div>
-        <div class="text-green-400 font-bold text-xs">📶</div>
       </div>
 
-      <!-- Usama - YOU (Blue) -->
-      <div id="card-blue" class="bg-[#0d0b21]/90 border-2 border-blue-500 rounded-3xl p-3.5 flex items-center justify-between shadow-[0_0_25px_rgba(59,130,246,0.6)] transition-all">
+      <div id="card-blue" class="bg-[#0d0b21]/90 border-2 border-blue-500 rounded-3xl p-3.5 flex items-center justify-between shadow-xl transition-all">
         <div class="flex items-center gap-3">
-          <div class="relative">
-            <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop&crop=faces" class="w-12 h-12 rounded-2xl object-cover border-2 border-blue-500">
-            <span class="absolute -top-2 -left-2 bg-blue-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md">YOU</span>
-            <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-600 rounded-full border border-white flex items-center justify-center text-[9px] font-black">🔵</span>
-          </div>
+          <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop&crop=faces" class="w-12 h-12 rounded-2xl object-cover border-2 border-blue-500">
           <div>
-            <div class="text-xs font-black text-blue-300">Usama</div>
-            <div class="text-[11px] font-bold text-yellow-400 flex items-center gap-1">🪙 2,450</div>
+            <div class="text-xs font-black text-blue-300">Usama (You)</div>
+            <div class="text-[11px] font-bold text-yellow-400">🪙 2,450</div>
           </div>
         </div>
-        <div class="text-blue-400 font-bold text-xs">📶</div>
       </div>
 
-      <!-- Hamza Sajid (Yellow) -->
-      <div id="card-yellow" class="bg-[#0d0b21]/90 border border-yellow-500/40 rounded-3xl p-3.5 flex items-center justify-between shadow-[0_0_20px_rgba(234,179,8,0.2)] transition-all">
+      <div id="card-yellow" class="bg-[#0d0b21]/90 border border-yellow-500/40 rounded-3xl p-3.5 flex items-center justify-between shadow-lg transition-all">
         <div class="flex items-center gap-3">
-          <div class="relative">
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces" class="w-12 h-12 rounded-2xl object-cover border-2 border-yellow-500">
-            <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-yellow-600 rounded-full border border-white flex items-center justify-center text-[9px] font-black">🟡</span>
-          </div>
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces" class="w-12 h-12 rounded-2xl object-cover border-2 border-yellow-500">
           <div>
             <div class="text-xs font-black text-slate-100">Hamza Sajid</div>
-            <div class="text-[11px] font-bold text-yellow-400 flex items-center gap-1">🪙 760</div>
+            <div class="text-[11px] font-bold text-yellow-400">🪙 760</div>
           </div>
         </div>
-        <div class="text-yellow-400 font-bold text-xs">📶</div>
       </div>
-
     </div>
   </main>
-
-  <footer class="p-3 text-center text-[11px] text-slate-600 font-medium">
-    Ludo Premium Multiplayer Engine &copy; 2026
-  </footer>
 
   <script>
     let currentDice = 0;
@@ -280,11 +230,12 @@
       blue: [-1, -1, -1, -1]
     };
 
+    // Safe base coordinate layout for 4 pawns inside each yard
     const yardCoords = {
-      red: [{x: 13, y: 13}, {x: 23, y: 13}, {x: 13, y: 23}, {x: 23, y: 23}],
-      green: [{x: 77, y: 13}, {x: 87, y: 13}, {x: 77, y: 23}, {x: 87, y: 23}],
-      yellow: [{x: 13, y: 77}, {x: 23, y: 77}, {x: 13, y: 87}, {x: 23, y: 87}],
-      blue: [{x: 77, y: 77}, {x: 87, y: 77}, {x: 77, y: 87}, {x: 87, y: 87}]
+      red: [{x: 15, y: 15}, {x: 23, y: 15}, {x: 15, y: 23}, {x: 23, y: 23}],
+      green: [{x: 77, y: 15}, {x: 85, y: 15}, {x: 77, y: 23}, {x: 85, y: 23}],
+      yellow: [{x: 15, y: 77}, {x: 23, y: 77}, {x: 15, y: 85}, {x: 23, y: 85}],
+      blue: [{x: 77, y: 77}, {x: 85, y: 77}, {x: 77, y: 85}, {x: 85, y: 85}]
     };
 
     const diceFaces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
@@ -295,21 +246,7 @@
     };
 
     function switchMode(mode) {
-      document.getElementById('tab-classic').className = "px-5 py-2 text-slate-400 hover:text-white text-xs font-bold rounded-xl cursor-pointer transition";
-      document.getElementById('tab-quick').className = "px-5 py-2 text-slate-400 hover:text-white text-xs font-bold rounded-xl cursor-pointer transition";
-      document.getElementById('tab-private').className = "px-5 py-2 text-slate-400 hover:text-white text-xs font-bold rounded-xl cursor-pointer transition";
-
-      if(mode === 'classic') {
-        document.getElementById('tab-classic').className = "px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-xs font-extrabold rounded-xl shadow-md cursor-pointer transition";
-        document.getElementById('display-game-mode').innerText = "Classic";
-      } else if(mode === 'quick') {
-        document.getElementById('tab-quick').className = "px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-xs font-extrabold rounded-xl shadow-md cursor-pointer transition";
-        document.getElementById('display-game-mode').innerText = "Quick Play";
-      } else if(mode === 'private') {
-        document.getElementById('tab-private').className = "px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-xs font-extrabold rounded-xl shadow-md cursor-pointer transition";
-        let room = prompt("Enter Room Code:", "ROOM777");
-        if(room) document.getElementById('display-game-mode').innerText = "Private (" + room.toUpperCase() + ")";
-      }
+      document.getElementById('display-game-mode').innerText = mode.toUpperCase();
     }
 
     function renderPawns() {
@@ -323,8 +260,6 @@
           pawn.className = `pawn pawn-${color} pointer-events-auto`;
           
           let activeColor = turnOrder[currentTurnIndex];
-          
-          // Highlight all pawns on active player's turn so any number (2, 3, etc.) can move/open them!
           if (activeColor === color && currentDice > 0) {
             pawn.classList.add('highlight');
           }
@@ -332,7 +267,7 @@
           pawn.innerText = idx + 1;
           pawn.onclick = () => handlePawnClick(color, idx);
 
-          let coords = pos === -1 ? yardCoords[color][idx] : { x: 45 + (idx * 2), y: 45 + (pos * 0.8) };
+          let coords = pos === -1 ? yardCoords[color][idx] : { x: 50 + (idx * 3), y: 50 + (pos * 0.5) };
           pawn.style.left = `${coords.x}%`;
           pawn.style.top = `${coords.y}%`;
           container.appendChild(pawn);
@@ -355,7 +290,6 @@
         diceDisplay.classList.remove('rolling');
 
         let activeColor = turnOrder[currentTurnIndex];
-        addSystemMessage(`${activeColor.toUpperCase()} rolled a ${currentDice}! Click any pawn to move.`);
         renderPawns();
       }, 400);
     }
@@ -374,14 +308,13 @@
 
       let pos = gameState[color][index];
       
-      // ANY NUMBER CAN OPEN PAWN NOW! No need to wait for 6.
+      // ANY number (2, 3, etc.) opens and moves the pawn!
       if (pos === -1) {
         gameState[color][index] = 0; 
       } else {
         gameState[color][index] = Math.min(50, pos + currentDice);
       }
 
-      // Reset dice and pass turn to next player smoothly
       currentDice = 0;
       document.getElementById('dice-display').innerText = '🎲';
       currentTurnIndex = (currentTurnIndex + 1) % turnOrder.length;
@@ -392,18 +325,14 @@
     function updateTurnUI() {
       let activeColor = turnOrder[currentTurnIndex];
       let names = { blue: 'Blue (You)', yellow: 'Hamza', green: 'Sara', red: 'Ali' };
-      let colors = { blue: 'text-blue-400', yellow: 'text-yellow-400', green: 'text-green-400', red: 'text-red-400' };
-
-      document.getElementById('turn-indicator-text').className = `text-xs font-extrabold ${colors[activeColor]}`;
       document.getElementById('turn-indicator-text').innerText = `🔵 ${names[activeColor]}`;
 
-      // Highlight active player card on the right
       ['red', 'green', 'blue', 'yellow'].forEach(c => {
         const card = document.getElementById(`card-${c}`);
         if (c === activeColor) {
-          card.style.transform = "scale(1.03)";
-          card.style.borderColor = c === 'blue' ? '#3b82f6' : c === 'red' ? '#ef4444' : c === 'green' ? '#22c55e' : '#eab308';
-          card.style.boxShadow = "0 0 30px rgba(168, 85, 247, 0.5)";
+          card.style.transform = "scale(1.02)";
+          card.style.borderColor = "#a855f7";
+          card.style.boxShadow = "0 0 25px rgba(168, 85, 247, 0.4)";
         } else {
           card.style.transform = "scale(1)";
           card.style.borderColor = "";
@@ -415,32 +344,14 @@
     function sendChatMessage() {
       const input = document.getElementById('msg-input');
       if (input.value.trim() !== "") {
-        appendChat("Usama", input.value.trim());
+        const box = document.getElementById('chat-messages');
+        const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        box.innerHTML += `<div class="p-2.5 bg-[#070514] rounded-xl border border-purple-500/10"><strong class="text-blue-400">Usama:</strong> ${input.value.trim()} <span class="text-[9px] text-slate-500 float-right">${timeStr}</span></div>`;
         input.value = "";
+        box.scrollTop = box.scrollHeight;
       }
     }
 
     function sendQuickEmoji(emoji) {
-      appendChat("Usama", emoji);
-    }
-
-    function appendChat(user, text) {
       const box = document.getElementById('chat-messages');
-      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      box.innerHTML += `<div class="p-2.5 bg-[#070514] rounded-xl border border-purple-500/10"><strong class="text-blue-400">${user}:</strong> ${text} <span class="text-[9px] text-slate-500 float-right">${timeStr}</span></div>`;
-      box.scrollTop = box.scrollHeight;
-    }
-
-    function addSystemMessage(msg) {
-      const box = document.getElementById('chat-messages');
-      box.innerHTML += `<div class="p-1 text-[10px] text-slate-500 text-center font-mono">${msg}</div>`;
-      box.scrollTop = box.scrollHeight;
-    }
-
-    function addCoins() {
-      let bal = parseInt(document.getElementById('coin-balance').innerText.replace(/,/g, '')) + 500;
-      document.getElementById('coin-balance').innerText = bal.toLocaleString();
-    }
-  </script>
-</body>
-</html>
+      box.innerHTML += `<div class="p-2.5 bg-[#070514] rounded-xl border border-purple-500/10

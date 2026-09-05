@@ -191,7 +191,7 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <button onclick="alert('Rules: Roll 6 to open pawn. Reach center to win!')" class="p-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-sm transition cursor-pointer">🛡️</button>
+          <button onclick="alert('Rules: Any number rolls can open pawn and move forward!')" class="p-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-sm transition cursor-pointer">🛡️</button>
           <button onclick="if(confirm('Quit game?')) location.reload()" class="p-2.5 bg-red-950/40 hover:bg-red-900/60 rounded-xl border border-red-500/30 text-sm transition cursor-pointer">🚪</button>
         </div>
       </div>
@@ -280,7 +280,6 @@
       blue: [-1, -1, -1, -1]
     };
 
-    // Exact Home Yard Coordinates for 4 Pawns per player inside the base boxes
     const yardCoords = {
       red: [{x: 13, y: 13}, {x: 23, y: 13}, {x: 13, y: 23}, {x: 23, y: 23}],
       green: [{x: 77, y: 13}, {x: 87, y: 13}, {x: 77, y: 23}, {x: 87, y: 23}],
@@ -324,13 +323,10 @@
           pawn.className = `pawn pawn-${color} pointer-events-auto`;
           
           let activeColor = turnOrder[currentTurnIndex];
-          let hasActive = gameState[activeColor].some(p => p !== -1);
           
-          // Highlight valid movable pawns
+          // Highlight all pawns on active player's turn so any number (2, 3, etc.) can move/open them!
           if (activeColor === color && currentDice > 0) {
-            if (pos !== -1 || currentDice === 6) {
-              pawn.classList.add('highlight');
-            }
+            pawn.classList.add('highlight');
           }
 
           pawn.innerText = idx + 1;
@@ -359,22 +355,8 @@
         diceDisplay.classList.remove('rolling');
 
         let activeColor = turnOrder[currentTurnIndex];
-        let hasActivePawns = gameState[activeColor].some(p => p !== -1);
-
-        // If player rolled non-6 and has no pawns out, auto-pass turn after 1.2s so it doesn't get stuck!
-        if (currentDice !== 6 && !hasActivePawns) {
-          addSystemMessage(`${activeColor.toUpperCase()} rolled a ${currentDice}. No active pawns! Passing turn...`);
-          setTimeout(() => {
-            currentDice = 0;
-            document.getElementById('dice-display').innerText = '🎲';
-            currentTurnIndex = (currentTurnIndex + 1) % turnOrder.length;
-            updateTurnUI();
-            renderPawns();
-          }, 1200);
-        } else {
-          addSystemMessage(`${activeColor.toUpperCase()} rolled a ${currentDice}! Click your highlighted pawn to move.`);
-          renderPawns();
-        }
+        addSystemMessage(`${activeColor.toUpperCase()} rolled a ${currentDice}! Click any pawn to move.`);
+        renderPawns();
       }, 400);
     }
 
@@ -392,18 +374,14 @@
 
       let pos = gameState[color][index];
       
+      // ANY NUMBER CAN OPEN PAWN NOW! No need to wait for 6.
       if (pos === -1) {
-        if (currentDice === 6) {
-          gameState[color][index] = 0; // Open pawn on 6
-        } else {
-          alert("You need a 6 to open this pawn!");
-          return;
-        }
+        gameState[color][index] = 0; 
       } else {
         gameState[color][index] = Math.min(50, pos + currentDice);
       }
 
-      // Reset dice and pass turn to next player
+      // Reset dice and pass turn to next player smoothly
       currentDice = 0;
       document.getElementById('dice-display').innerText = '🎲';
       currentTurnIndex = (currentTurnIndex + 1) % turnOrder.length;

@@ -1,71 +1,46 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+const io = new Server(server);
 
-const PORT = process.env.PORT || 10000;
-
-// Yeh route explicitly index.html ko browser par bhejega
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.use(express.static(path.join(__dirname)));
-
-const rooms = {};
+app.use(express.static(__dirname));
 
 io.on('connection', (socket) => {
-  socket.on('create_or_join_room', ({ roomId, maxPlayers, username }) => {
+  console.log('Player Connected:', socket.id);
+
+  socket.on('join_room', (data) => {
+    const { roomId, username } = data;
     socket.join(roomId);
+    socket.to(roomId).emit('player_joined', { id: socket.id, username });
+    console.log(`${username} joined room: ${roomId}`);
+  });
 
-    if (!rooms[roomId]) {
-      rooms[roomId] = {
-        maxPlayers: parseInt(maxPlayers) || 4,
-        players: [],
-        gameState: { turn: 0, dice: 1 }
-      };
-    }
+  socket.on('send_message', (data) => {
+    socket.to(data.room).emit('receive_message', { username: data.username, msg: data.msg });
+  });
 
-    const room = rooms[roomId];
+  // WebRTC Signaling for Real Voice Chat
+  socket.on('webrtc_offer', (data) => {
+    socket.to(data.room).emit('webrtc_offer', { offer: data.offer, sender: socket.id });
+  });
 
-    if (room.players.length < room.maxPlayers) {
-      const playerColors = ['Red', 'Green', 'Yellow', 'Blue'];
-      const playerColor = playerColors[room.players.length];
-      
-      room.players.push({ id: socket.id, username, color: playerColor });
-      
-      io.to(roomId).emit('room_update', {
-        players: room.players,
-        maxPlayers: room.maxPlayers,
-        roomId
-      });
+  socket.on('webrtc_answer', (data) => {
+    socket.to(data.room).emit('webrtc_answer', { answer: data.answer, sender: socket.id });
+  });
 
-      socket.on('send_message', (msg) => {
-        io.to(roomId).emit('receive_message', { username, msg });
-      });
+  socket.on('webrtc_ice', (data) => {
+    socket.to(data.room).emit('webrtc_ice', { candidate: data.candidate, sender: socket.id });
+  });
 
-      socket.on('roll_dice', () => {
-        const diceValue = Math.floor(Math.random() * 6) + 1;
-        room.gameState.dice = diceValue;
-        if (diceValue !== 6) {
-          room.gameState.turn = (room.gameState.turn + 1) % room.players.length;
-        }
-        io.to(roomId).emit('dice_rolled', {
-          diceValue,
-          nextTurnPlayer: room.players[room.gameState.turn]
-        });
-      });
-
-    } else {
-      socket.emit('room_full');
-    }
+  socket.on('disconnect', () => {
+    console.log('Player Disconnected:', socket.id);
   });
 });
 
+const PORT = process.env.PORT || 10000;
 server.listen(PORT, () => {
-  console.log(`Ludo Server Live on Port ${PORT}`);
+  console.log(`Ludo Premium Server Live on Port ${PORT}`);
 });

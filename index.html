@@ -5,30 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ludo Premium - Elite Multiplayer Arena</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap');
-    body { font-family: 'Outfit', sans-serif; background-color: #070614; color: #f8fafc; overflow-x: hidden; }
+    body { font-family: 'Outfit', sans-serif; background-color: #070514; color: #f8fafc; overflow-x: hidden; }
 
     /* Elite Glossy 3D Tokens */
     .pawn {
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 900;
       color: white;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,255,255,0.9), inset 0 -2px 4px rgba(0,0,0,0.6);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,255,255,0.9), inset 0 -2px 4px rgba(0,0,0,0.6);
       position: absolute;
       z-index: 40;
       transform: translate(-50%, -50%);
     }
-    .pawn:hover { transform: translate(-50%, -50%) scale(1.35) translateY(-4px); filter: brightness(1.25); }
+    .pawn:hover { transform: translate(-50%, -50%) scale(1.4) translateY(-4px); filter: brightness(1.3); }
     .pawn.highlight { animation: proGlow 0.8s infinite alternate; }
 
     .pawn-red { background: radial-gradient(circle at 35% 35%, #f87171, #dc2626 70%, #991b1b); border: 2px solid #fee2e2; }
@@ -37,9 +36,18 @@
     .pawn-blue { background: radial-gradient(circle at 35% 35%, #60a5fa, #2563eb 70%, #1e40af); border: 2px solid #eff6ff; }
 
     @keyframes proGlow {
-      0% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 8px #fff, 0 0 15px currentColor; }
-      100% { transform: translate(-50%, -50%) scale(1.2); box-shadow: 0 0 18px #fff, 0 0 28px currentColor; }
+      0% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 10px #fff, 0 0 20px currentColor; }
+      100% { transform: translate(-50%, -50%) scale(1.25); box-shadow: 0 0 20px #fff, 0 0 35px currentColor; }
     }
+
+    @keyframes diceRoll {
+      0% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-15deg) scale(1.1); }
+      50% { transform: rotate(15deg) scale(0.95); }
+      75% { transform: rotate(-10deg) scale(1.05); }
+      100% { transform: rotate(0deg) scale(1); }
+    }
+    .rolling { animation: diceRoll 0.4s ease-in-out; }
 
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.4); }
@@ -56,7 +64,7 @@
       </div>
     </div>
     
-    <!-- Fully Interactive Mode Nav Tabs -->
+    <!-- Mode Tabs -->
     <div class="hidden md:flex items-center bg-[#070514] p-1.5 rounded-2xl border border-purple-500/20 gap-1 shadow-inner">
       <button id="tab-classic" onclick="switchMode('classic')" class="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-xs font-extrabold rounded-xl shadow-md cursor-pointer transition">🎲 CLASSIC</button>
       <button id="tab-quick" onclick="switchMode('quick')" class="px-5 py-2 text-slate-400 hover:text-white text-xs font-bold rounded-xl cursor-pointer transition">⚡ QUICK PLAY</button>
@@ -76,27 +84,8 @@
     </div>
   </header>
 
-  <!-- LOBBY SCREEN -->
-  <main id="lobby-screen" class="max-w-md w-full mx-auto p-8 my-auto bg-[#0d0b21]/90 border border-purple-500/30 backdrop-blur-3xl rounded-[2.5rem] shadow-[0_0_60px_rgba(147,51,234,0.3)] space-y-6">
-    <div class="text-center space-y-2">
-      <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-200 to-pink-400">Join Elite Match</h2>
-      <p class="text-xs text-slate-400">Enter battle tag & room code to launch</p>
-    </div>
-    <div class="space-y-4">
-      <div>
-        <label class="text-xs font-bold text-purple-300">Your Battle Name</label>
-        <input id="username-input" type="text" value="Usama" class="w-full bg-[#070514] border border-purple-500/30 rounded-2xl p-4 text-sm text-slate-200 focus:outline-none focus:border-purple-500 transition mt-1.5 shadow-inner">
-      </div>
-      <div>
-        <label class="text-xs font-bold text-purple-300">Room Code</label>
-        <input id="room-input" type="text" value="ABCD1234" class="w-full bg-[#070514] border border-purple-500/30 rounded-2xl p-4 text-sm font-mono text-purple-300 uppercase focus:outline-none focus:border-purple-500 transition mt-1.5 shadow-inner">
-      </div>
-    </div>
-    <button onclick="joinRoom()" class="w-full py-4 bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 hover:opacity-95 font-black uppercase tracking-widest rounded-2xl text-xs shadow-xl shadow-purple-600/40 transition transform active:scale-95 cursor-pointer">START GAME 🎲</button>
-  </main>
-
-  <!-- GAMEPLAY SCREEN -->
-  <main id="game-screen" class="max-w-7xl w-full mx-auto p-4 hidden grid grid-cols-1 lg:grid-cols-4 gap-6 my-auto">
+  <!-- MAIN GAME SCREEN -->
+  <main class="max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-4 gap-6 my-auto">
     
     <!-- LEFT SIDEBAR: Game Info & Chat -->
     <div class="space-y-4 flex flex-col">
@@ -106,7 +95,9 @@
         </div>
         <div class="flex justify-between items-center text-xs">
           <span class="text-slate-400">ROOM CODE</span>
-          <span id="display-room-code" class="font-mono text-purple-300 font-extrabold tracking-wider bg-purple-500/10 px-2.5 py-1 rounded-xl border border-purple-500/20">ABCD1234</span>
+          <span class="font-mono text-purple-300 font-extrabold tracking-wider bg-purple-500/10 px-2.5 py-1 rounded-xl border border-purple-500/20 flex items-center gap-2">
+            ABCD1234 📋
+          </span>
         </div>
         <div class="flex justify-between items-center text-xs">
           <span class="text-slate-400">GAME MODE</span>
@@ -115,17 +106,17 @@
         <div class="grid grid-cols-2 gap-2 pt-1">
           <div class="bg-[#070514] p-2.5 rounded-2xl border border-purple-500/10 text-center">
             <div class="text-[10px] text-slate-500 font-bold">TIME</div>
-            <div class="text-xs font-extrabold text-slate-200">⏱️ 10:00</div>
+            <div id="timer-display" class="text-xs font-extrabold text-slate-200">⏱️ 10:00</div>
           </div>
           <div class="bg-[#070514] p-2.5 rounded-2xl border border-purple-500/10 text-center">
             <div class="text-[10px] text-slate-500 font-bold">TURN</div>
-            <div id="turn-indicator-text" class="text-xs font-extrabold text-blue-400">🔵 You</div>
+            <div id="turn-indicator-text" class="text-xs font-extrabold text-blue-400">🔵 Blue (You)</div>
           </div>
         </div>
       </div>
 
       <!-- CHAT BOX -->
-      <div class="bg-[#0d0b21]/80 border border-purple-500/20 backdrop-blur-2xl rounded-3xl p-4 flex-1 flex flex-col justify-between h-[300px] shadow-xl">
+      <div class="bg-[#0d0b21]/80 border border-purple-500/20 backdrop-blur-2xl rounded-3xl p-4 flex-1 flex flex-col justify-between h-[280px] shadow-xl">
         <div class="flex justify-between items-center border-b border-purple-500/20 pb-2">
           <span class="text-xs font-black text-purple-300 flex items-center gap-2">💬 CHAT</span>
           <span class="text-[10px] text-slate-400 cursor-pointer hover:text-white" onclick="toggleChatBox()">Hide</span>
@@ -133,6 +124,7 @@
         <div id="chat-messages" class="flex-1 overflow-y-auto space-y-2.5 py-2 text-xs pr-1">
           <div class="p-2.5 bg-[#070514] rounded-xl border border-purple-500/10"><strong class="text-red-400">Ali:</strong> Good luck! <span class="text-[9px] text-slate-500 float-right">10:30 PM</span></div>
           <div class="p-2.5 bg-[#070514] rounded-xl border border-purple-500/10"><strong class="text-green-400">Sara:</strong> Thanks! You too <span class="text-[9px] text-slate-500 float-right">10:31 PM</span></div>
+          <div class="p-2.5 bg-[#070514] rounded-xl border border-purple-500/10"><strong class="text-yellow-400">Hamza:</strong> Let's play fair! <span class="text-[9px] text-slate-500 float-right">10:31 PM</span></div>
         </div>
         <div class="flex gap-2 pt-2 border-t border-purple-500/20">
           <input id="msg-input" type="text" placeholder="Type a message..." class="flex-1 bg-[#070514] border border-purple-500/20 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-purple-500 shadow-inner" onkeypress="if(event.key==='Enter') sendChatMessage()">
@@ -144,7 +136,7 @@
     <!-- CENTER LUDO BOARD & CONTROLS -->
     <div class="lg:col-span-2 bg-[#0d0b21]/50 border border-purple-500/20 backdrop-blur-2xl rounded-[2.5rem] p-5 flex flex-col items-center justify-between shadow-2xl space-y-4">
       
-      <!-- BOARD CONTAINER WITH PERFECTLY ALIGNED 3D TOKENS -->
+      <!-- LUDO BOARD CONTAINER -->
       <div class="relative w-full max-w-[430px] aspect-square bg-[#070514] border-4 border-purple-500/30 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.9)] overflow-hidden flex items-center justify-center">
         <svg viewBox="0 0 600 600" class="w-full h-full drop-shadow-2xl">
           <rect width="600" height="600" fill="#0b091a" />
@@ -183,12 +175,12 @@
       <div class="w-full flex items-center justify-between bg-[#070514]/90 p-3 rounded-2xl border border-purple-500/20 shadow-lg">
         <div class="flex items-center gap-2">
           <button onclick="sendQuickEmoji('🔥')" class="p-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-sm transition cursor-pointer shadow-sm">🔥</button>
-          <button id="mic-btn" onclick="toggleVoiceChat()" class="p-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-sm transition cursor-pointer shadow-sm" title="Toggle Voice Chat">🎙️</button>
-          <button onclick="toggleSound()" class="p-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-sm transition cursor-pointer shadow-sm">🔊</button>
+          <button onclick="alert('Mic Active')" class="p-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-sm transition cursor-pointer shadow-sm">🎙️</button>
+          <button onclick="alert('Sound On')" class="p-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-sm transition cursor-pointer shadow-sm">🔊</button>
         </div>
 
         <div class="flex items-center gap-3">
-          <button onclick="undoMove()" class="px-3.5 py-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer">
+          <button onclick="alert('Undo move')" class="px-3.5 py-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer">
             ↩️ <span class="bg-purple-600 text-white text-[10px] px-1.5 py-0.5 rounded-md">2</span>
           </button>
           
@@ -199,15 +191,17 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <button onclick="showRules()" class="p-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-sm transition cursor-pointer">🛡️</button>
-          <button onclick="quitGame()" class="p-2.5 bg-red-950/40 hover:bg-red-900/60 rounded-xl border border-red-500/30 text-sm transition cursor-pointer">🚪</button>
+          <button onclick="alert('Rules: Roll 6 to open pawn. Reach center to win!')" class="p-2.5 bg-[#120f2e] hover:bg-purple-900/40 rounded-xl border border-purple-500/20 text-sm transition cursor-pointer">🛡️</button>
+          <button onclick="if(confirm('Quit game?')) location.reload()" class="p-2.5 bg-red-950/40 hover:bg-red-900/60 rounded-xl border border-red-500/30 text-sm transition cursor-pointer">🚪</button>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT SIDEBAR: PLAYER CARDS -->
+    <!-- RIGHT SIDEBAR: PLAYER CARDS WITH DYNAMIC TURN GLOW -->
     <div class="space-y-3.5 flex flex-col justify-center">
-      <div class="bg-[#0d0b21]/90 border border-red-500/40 rounded-3xl p-3.5 flex items-center justify-between shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+      
+      <!-- Ali Khan (Red) -->
+      <div id="card-red" class="bg-[#0d0b21]/90 border border-red-500/40 rounded-3xl p-3.5 flex items-center justify-between shadow-[0_0_20px_rgba(239,68,68,0.2)] transition-all">
         <div class="flex items-center gap-3">
           <div class="relative">
             <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" class="w-12 h-12 rounded-2xl object-cover border-2 border-red-500">
@@ -221,7 +215,8 @@
         <div class="text-red-400 font-bold text-xs">📶</div>
       </div>
 
-      <div class="bg-[#0d0b21]/90 border border-green-500/40 rounded-3xl p-3.5 flex items-center justify-between shadow-[0_0_20px_rgba(34,197,94,0.2)]">
+      <!-- Sara Malik (Green) -->
+      <div id="card-green" class="bg-[#0d0b21]/90 border border-green-500/40 rounded-3xl p-3.5 flex items-center justify-between shadow-[0_0_20px_rgba(34,197,94,0.2)] transition-all">
         <div class="flex items-center gap-3">
           <div class="relative">
             <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop&crop=faces" class="w-12 h-12 rounded-2xl object-cover border-2 border-green-500">
@@ -235,7 +230,8 @@
         <div class="text-green-400 font-bold text-xs">📶</div>
       </div>
 
-      <div class="bg-[#0d0b21]/90 border-2 border-blue-500 rounded-3xl p-3.5 flex items-center justify-between shadow-[0_0_25px_rgba(59,130,246,0.4)]">
+      <!-- Usama - YOU (Blue) -->
+      <div id="card-blue" class="bg-[#0d0b21]/90 border-2 border-blue-500 rounded-3xl p-3.5 flex items-center justify-between shadow-[0_0_25px_rgba(59,130,246,0.6)] transition-all">
         <div class="flex items-center gap-3">
           <div class="relative">
             <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop&crop=faces" class="w-12 h-12 rounded-2xl object-cover border-2 border-blue-500">
@@ -243,14 +239,15 @@
             <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-600 rounded-full border border-white flex items-center justify-center text-[9px] font-black">🔵</span>
           </div>
           <div>
-            <div id="display-my-name" class="text-xs font-black text-blue-300">Usama</div>
+            <div class="text-xs font-black text-blue-300">Usama</div>
             <div class="text-[11px] font-bold text-yellow-400 flex items-center gap-1">🪙 2,450</div>
           </div>
         </div>
         <div class="text-blue-400 font-bold text-xs">📶</div>
       </div>
 
-      <div class="bg-[#0d0b21]/90 border border-yellow-500/40 rounded-3xl p-3.5 flex items-center justify-between shadow-[0_0_20px_rgba(234,179,8,0.2)]">
+      <!-- Hamza Sajid (Yellow) -->
+      <div id="card-yellow" class="bg-[#0d0b21]/90 border border-yellow-500/40 rounded-3xl p-3.5 flex items-center justify-between shadow-[0_0_20px_rgba(234,179,8,0.2)] transition-all">
         <div class="flex items-center gap-3">
           <div class="relative">
             <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces" class="w-12 h-12 rounded-2xl object-cover border-2 border-yellow-500">
@@ -263,6 +260,7 @@
         </div>
         <div class="text-yellow-400 font-bold text-xs">📶</div>
       </div>
+
     </div>
   </main>
 
@@ -271,9 +269,10 @@
   </footer>
 
   <script>
-    const socket = io();
-    let currentRoom = "ABCD1234", myUsername = "Usama", currentDice = 0;
-    let localStream = null, peerConnection = null;
+    // Game State Management
+    let currentDice = 0;
+    let turnOrder = ['blue', 'yellow', 'green', 'red'];
+    let currentTurnIndex = 0; // Starts with Blue (Usama)
 
     let gameState = {
       red: [-1, -1, -1, -1],
@@ -282,7 +281,7 @@
       blue: [-1, -1, -1, -1]
     };
 
-    // Perfectly positioned 3D tokens inside base yards
+    // Yard base coordinates inside the board
     const yardCoords = {
       red: [{x: 14, y: 14}, {x: 26, y: 14}, {x: 14, y: 26}, {x: 26, y: 26}],
       green: [{x: 74, y: 14}, {x: 86, y: 14}, {x: 74, y: 26}, {x: 86, y: 26}],
@@ -290,8 +289,11 @@
       blue: [{x: 74, y: 74}, {x: 86, y: 74}, {x: 74, y: 86}, {x: 86, y: 86}]
     };
 
+    const diceFaces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+
     window.onload = () => {
       renderPawns();
+      updateTurnUI();
     };
 
     function switchMode(mode) {
@@ -307,29 +309,9 @@
         document.getElementById('display-game-mode').innerText = "Quick Play";
       } else if(mode === 'private') {
         document.getElementById('tab-private').className = "px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-xs font-extrabold rounded-xl shadow-md cursor-pointer transition";
-        document.getElementById('display-game-mode').innerText = "Private Room";
-        let newRoom = prompt("Enter Private Room Code:", "ELITE99");
-        if(newRoom) {
-          currentRoom = newRoom.toUpperCase();
-          document.getElementById('display-room-code').innerText = currentRoom;
-        }
+        let room = prompt("Enter Room Code:", "ROOM777");
+        if(room) document.getElementById('display-game-mode').innerText = "Private (" + room.toUpperCase() + ")";
       }
-    }
-
-    function joinRoom() {
-      myUsername = document.getElementById('username-input').value.trim() || 'Usama';
-      currentRoom = document.getElementById('room-input').value.trim().toUpperCase() || 'ABCD1234';
-
-      socket.emit('join_room', { roomId: currentRoom, username: myUsername });
-
-      document.getElementById('lobby-screen').style.display = 'none';
-      const gameScreen = document.getElementById('game-screen');
-      gameScreen.classList.remove('hidden');
-      gameScreen.style.display = 'grid';
-
-      document.getElementById('display-room-code').innerText = currentRoom;
-      document.getElementById('display-my-name').innerText = myUsername;
-      addSystemMessage(`Connected to Room ${currentRoom}`);
     }
 
     function renderPawns() {
@@ -341,6 +323,9 @@
         gameState[color].forEach((pos, idx) => {
           const pawn = document.createElement('div');
           pawn.className = `pawn pawn-${color} pointer-events-auto`;
+          if (turnOrder[currentTurnIndex] === color && currentDice > 0) {
+            pawn.classList.add('highlight');
+          }
           pawn.innerText = idx + 1;
           pawn.onclick = () => handlePawnClick(color, idx);
 
@@ -353,52 +338,95 @@
     }
 
     function rollDice() {
-      currentDice = Math.floor(Math.random() * 6) + 1;
-      document.getElementById('dice-display').innerText = ['⚀','⚁','⚂','⚃','⚄','⚅'][currentDice - 1];
-      addSystemMessage(`Rolled a ${currentDice}! Select your pawn.`);
+      if (currentDice > 0) {
+        alert("Please move your pawn first!");
+        return;
+      }
+
+      const diceBtn = document.getElementById('roll-btn');
+      const diceDisplay = document.getElementById('dice-display');
+      diceDisplay.classList.add('rolling');
+
+      setTimeout(() => {
+        currentDice = Math.floor(Math.random() * 6) + 1;
+        diceDisplay.innerText = diceFaces[currentDice - 1];
+        diceDisplay.classList.remove('rolling');
+
+        let activeColor = turnOrder[currentTurnIndex];
+        addSystemMessage(`${activeColor.toUpperCase()} rolled a ${currentDice}! Click your pawn to move.`);
+        renderPawns();
+      }, 400);
     }
 
     function handlePawnClick(color, index) {
+      let activeColor = turnOrder[currentTurnIndex];
+      if (color !== activeColor) {
+        alert(`It's ${activeColor.toUpperCase()}'s turn!`);
+        return;
+      }
+
       if (currentDice === 0) {
         alert("Roll the dice first!");
         return;
       }
+
       let pos = gameState[color][index];
       if (pos === -1 && currentDice === 6) {
-        gameState[color][index] = 0;
+        gameState[color][index] = 0; // Open pawn
       } else if (pos !== -1) {
         gameState[color][index] = Math.min(50, pos + currentDice);
       } else {
-        alert("Need a 6 to open pawn!");
+        alert("Need a 6 on the dice to open this pawn!");
         return;
       }
+
+      // Reset dice & pass turn to next player
       currentDice = 0;
       document.getElementById('dice-display').innerText = '🎲';
+      currentTurnIndex = (currentTurnIndex + 1) % turnOrder.length;
+      updateTurnUI();
       renderPawns();
+    }
+
+    function updateTurnUI() {
+      let activeColor = turnOrder[currentTurnIndex];
+      let names = { blue: 'Blue (You)', yellow: 'Hamza', green: 'Sara', red: 'Ali' };
+      let colors = { blue: 'text-blue-400', yellow: 'text-yellow-400', green: 'text-green-400', red: 'text-red-400' };
+
+      document.getElementById('turn-indicator-text').className = `text-xs font-extrabold ${colors[activeColor]}`;
+      document.getElementById('turn-indicator-text').innerText = `🔵 ${names[activeColor]}`;
+
+      // Highlight active player card on the right
+      ['red', 'green', 'blue', 'yellow'].forEach(c => {
+        const card = document.getElementById(`card-${c}`);
+        if (c === activeColor) {
+          card.style.transform = "scale(1.03)";
+          card.style.borderColor = c === 'blue' ? '#3b82f6' : c === 'red' ? '#ef4444' : c === 'green' ? '#22c55e' : '#eab308';
+          card.style.boxShadow = "0 0 30px rgba(168, 85, 247, 0.5)";
+        } else {
+          card.style.transform = "scale(1)";
+          card.style.borderColor = "";
+          card.style.boxShadow = "";
+        }
+      });
     }
 
     function sendChatMessage() {
       const input = document.getElementById('msg-input');
       if (input.value.trim() !== "") {
-        socket.emit('send_message', { room: currentRoom, username: myUsername, msg: input.value.trim() });
-        appendChat(myUsername, input.value.trim());
+        appendChat("Usama", input.value.trim());
         input.value = "";
       }
     }
 
     function sendQuickEmoji(emoji) {
-      socket.emit('send_message', { room: currentRoom, username: myUsername, msg: emoji });
-      appendChat(myUsername, emoji);
+      appendChat("Usama", emoji);
     }
-
-    socket.on('receive_message', (data) => {
-      appendChat(data.username, data.msg);
-    });
 
     function appendChat(user, text) {
       const box = document.getElementById('chat-messages');
       const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      box.innerHTML += `<div class="p-2.5 bg-[#070514] rounded-xl border border-purple-500/10"><strong class="text-purple-300">${user}:</strong> ${text} <span class="text-[9px] text-slate-500 float-right">${timeStr}</span></div>`;
+      box.innerHTML += `<div class="p-2.5 bg-[#070514] rounded-xl border border-purple-500/10"><strong class="text-blue-400">${user}:</strong> ${text} <span class="text-[9px] text-slate-500 float-right">${timeStr}</span></div>`;
       box.scrollTop = box.scrollHeight;
     }
 
@@ -408,33 +436,10 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    async function toggleVoiceChat() {
-      const micBtn = document.getElementById('mic-btn');
-      if (!localStream) {
-        try {
-          localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-          micBtn.style.background = '#22c55e';
-          alert("🎙️ Voice Chat Connected!");
-        } catch (err) {
-          alert("Microphone permission denied.");
-        }
-      } else {
-        localStream.getTracks().forEach(track => track.stop());
-        localStream = null;
-        micBtn.style.background = '#120f2e';
-        alert("🎙️ Voice Chat Disconnected.");
-      }
-    }
-
     function addCoins() {
       let bal = parseInt(document.getElementById('coin-balance').innerText.replace(',', '')) + 500;
       document.getElementById('coin-balance').innerText = bal.toLocaleString();
     }
-
-    function undoMove() { alert("Undo action applied."); }
-    function toggleSound() { alert("Sound Toggled."); }
-    function showRules() { alert("Rules: Roll 6 to open pawn. Reach center home to win!"); }
-    function quitGame() { if(confirm("Are you sure you want to quit?")) location.reload(); }
   </script>
 </body>
 </html>
